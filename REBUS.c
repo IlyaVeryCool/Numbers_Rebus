@@ -18,7 +18,7 @@ int WORDS_MAX_LENGTH = 0;
 
 #define undefined (char)   -1
 
-//#define DEBUG_show_solution
+#define DEBUG_show_solution
 #define DEBUG_show_time
 
 char alth_table[256];
@@ -126,13 +126,13 @@ char check_input(char* str)
 			}
 			break;
 		case 4://+
-			if (flags[8] == 1)//шла запись слова
+			if ((flags[8] ^ true) == 0)//шла запись слова
 			{
 				//добавление слова в структуру
 				adding_word(flags, buffer, &length);
 				flags[8] = 0;
 			}
-			if (flags[1] == 0 && flags[5] == 1 && flags[7] == 0 && flags[6] == 0)// если в начале было слово и слева от символа было слово и плюса не было
+			if (flags[1] == 0 && (flags[5] ^ true) == 0 && (flags[7]) == 0 && (flags[6]) == 0)// если в начале было слово и слева от символа было слово и плюса не было
 			{
 
 				flags[2] = 0;//плюс появился раньше равно, снимаем флаг
@@ -146,13 +146,13 @@ char check_input(char* str)
 			}
 			break;
 		case 3://=
-			if (flags[8] == 1)// если было заполнение слова
+			if ((flags[8] ^ true) == 0)// если было заполнение слова
 			{
 				//добавление слова в структуру
 				adding_word(flags, buffer, &length);
 				flags[8] = 0;
 			}
-			if (flags[0] && (flags[2] == 0) && (flags[5] == 1))//проверяем что слева были значения и то что = появилось позже +
+			if (flags[0] && (flags[2] == 0) && ((flags[5] ^ true) == 0))//проверяем что слева были значения и то что = появилось позже +
 			{
 
 				flags[7] = 1;//появилось равно
@@ -164,7 +164,7 @@ char check_input(char* str)
 			}
 			break;
 		case 2://' '
-			if (flags[8] == 1)
+			if ((flags[8] ^ true) == 0)
 			{
 				//добавление слова в структуру
 				adding_word(flags, buffer, &length);
@@ -172,7 +172,7 @@ char check_input(char* str)
 			}
 			break;
 		case 1://'/0'
-			if (flags[8] == 1)
+			if ((flags[8] ^ true) == 0)
 			{
 				//добавление слова в структуру
 				adding_word(flags, buffer, &length);
@@ -369,7 +369,7 @@ int solve(int pos, int l) {
 		}
 		else { // погнали дальше if конец то EXIT
 			if (pos >= max_len - 1) {
-				printf("\n\t\t\tDONE!!");
+				printf("\n\t\t\tDone!!");
 				display_current_state();
 				return success;
 			}
@@ -421,12 +421,23 @@ int main() {
 	memset(used, false, 10);
 
 	table = (char**)calloc(WORDS_COUNT, sizeof(char*));
-	for (int i = 0; i < WORDS_COUNT; i++) {
-		table[i] = (char*)calloc(max_len, sizeof(char));
-		unsigned int margin = max_len - words[i].lenth;
-		memcpy(table[i] + margin, words[i].word, words[i].lenth);
+	if ((WORDS_COUNT & 1) == 0) {
+		for (int i = 0; i < WORDS_COUNT; i += 2) {
+			table[i] = (char *)calloc(max_len, sizeof(char));
+			unsigned int margin = max_len - words[i].lenth;
+			memcpy(table[i] + margin, words[i].word, words[i].lenth);
+			table[i + 1] = (char *)calloc(max_len, sizeof(char));
+			margin = max_len - words[i + 1].lenth;
+			memcpy(table[i + 1] + margin, words[i + 1].word, words[i + 1].lenth);
+		}
 	}
-
+	else {
+		for (int i = 0; i < WORDS_COUNT; i++) {
+			table[i] = (char *)calloc(max_len, sizeof(char));
+			unsigned int margin = max_len - words[i].lenth;
+			memcpy(table[i] + margin, words[i].word, words[i].lenth);
+		}
+	}
 
 
 	start_solution();
